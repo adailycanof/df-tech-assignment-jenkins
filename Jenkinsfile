@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        // (Optional) if you have a “.NET SDK” tool named “dotnet6” in Jenkins → Global Tool Configuration
+        // dotnet 'dotnet6'
+    }
+
     environment {
         // Opt out of telemetry to speed up dotnet commands
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
@@ -56,7 +61,8 @@ pipeline {
 
     post {
         always {
-            junit includePattern: 'projects/testing/nunit-1/TestResults/*.xml'
+            // Correct usage: pass the XML‐glob directly, or use testResults:
+            junit 'projects/testing/nunit-1/TestResults/*.xml'
         }
     }
 }
