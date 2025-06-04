@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'mcr.microsoft.com/dotnet/sdk:6.0'
+        }
+    }
 
     // tools {
         // (Optional) if you have a ".NET SDK" tool named "dotnet6" in Jenkins → Global Tool Configuration
