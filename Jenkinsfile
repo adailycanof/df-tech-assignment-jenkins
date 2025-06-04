@@ -1,10 +1,10 @@
 pipeline {
     agent any
 
-    tools {
+    // tools {
         // (Optional) if you have a ".NET SDK" tool named "dotnet6" in Jenkins → Global Tool Configuration
         // dotnet 'dotnet6'
-    }
+    // }
 
     environment {
         // Opt out of telemetry to speed up dotnet commands
