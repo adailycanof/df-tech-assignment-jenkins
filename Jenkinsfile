@@ -7,19 +7,40 @@ pipeline {
         DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
         DOTNET_ROOT = '/tmp/dotnet'
         PATH = "${env.DOTNET_ROOT}:${env.PATH}"
+        // Fallback for systems without ICU
+        DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = '1'
     }
 
     stages {
         stage('Install .NET SDK') {
             steps {
                 sh '''
+                    # Install required dependencies for .NET
+                    if command -v apt-get > /dev/null; then
+                        # Ubuntu/Debian
+                        sudo apt-get update
+                        sudo apt-get install -y libicu-dev libssl-dev ca-certificates libc6 libgcc1 libgssapi-krb5-2 libstdc++6 zlib1g
+                    elif command -v yum > /dev/null; then
+                        # CentOS/RHEL
+                        sudo yum install -y libicu openssl-libs ca-certificates glibc libgcc libstdc++ zlib
+                    elif command -v apk > /dev/null; then
+                        # Alpine
+                        sudo apk add --no-cache icu-libs krb5-libs libgcc libintl libssl3 libstdc++ zlib
+                    fi
+                    
                     if [ ! -d "/tmp/dotnet" ]; then
                         echo "Installing .NET 6.0 SDK..."
                         curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version 6.0.425 --install-dir /tmp/dotnet
                     else
                         echo ".NET SDK already installed"
                     fi
-                    /tmp/dotnet/dotnet --version
+                    
+                    # Test the installation
+                    /tmp/dotnet/dotnet --version || {
+                        echo "Setting globalization to invariant mode..."
+                        export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+                        /tmp/dotnet/dotnet --version
+                    }
                 '''
             }
         }
