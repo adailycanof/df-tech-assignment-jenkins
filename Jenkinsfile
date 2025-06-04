@@ -72,9 +72,13 @@ pipeline {
 
     post {
         always {
-            node {
-                // Publish test results
-                junit 'project-zero/nunit-1/TestResults/*.xml'
+            script {
+                // Only try to publish test results if they exist
+                if (fileExists('project-zero/nunit-1/TestResults/*.xml')) {
+                    junit 'project-zero/nunit-1/TestResults/*.xml'
+                } else {
+                    echo 'No test results found'
+                }
             }
         }
     }
