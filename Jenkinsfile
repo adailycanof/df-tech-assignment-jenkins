@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        // (Optional) if you have a “.NET SDK” tool named “dotnet6” in Jenkins → Global Tool Configuration
+        // (Optional) if you have a ".NET SDK" tool named "dotnet6" in Jenkins → Global Tool Configuration
         // dotnet 'dotnet6'
     }
 
@@ -21,7 +21,7 @@ pipeline {
 
         stage('Restore') {
             steps {
-                dir('projects/testing/nunit-1') {
+                dir('project-zero/nunit-1') {
                     sh 'dotnet restore'
                 }
             }
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('projects/testing/nunit-1') {
+                dir('project-zero/nunit-1') {
                     sh 'dotnet build --configuration Release --no-restore'
                 }
             }
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                dir('projects/testing/nunit-1') {
+                dir('project-zero/nunit-1') {
                     sh 'dotnet test --configuration Release --no-build --logger:junit'
                 }
             }
@@ -45,7 +45,7 @@ pipeline {
 
         stage('Publish') {
             steps {
-                dir('projects/testing/nunit-1') {
+                dir('project-zero/nunit-1') {
                     sh 'dotnet publish --configuration Release --output out'
                 }
             }
@@ -54,7 +54,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Archiving published artifacts for deployment...'
-                archiveArtifacts artifacts: 'projects/testing/nunit-1/out/**/*', fingerprint: true
+                archiveArtifacts artifacts: 'project-zero/nunit-1/out/**/*', fingerprint: true
             }
         }
     }
@@ -62,7 +62,7 @@ pipeline {
     post {
         always {
             // Correct usage: pass the XML‐glob directly, or use testResults:
-            junit 'projects/testing/nunit-1/TestResults/*.xml'
+            junit 'project-zero/nunit-1/TestResults/*.xml'
         }
     }
 }
